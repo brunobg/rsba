@@ -26,9 +26,9 @@ std::vector<gen::Observation> convertCV(
 	const cv::Ptr<cv::Feature2D> _featureDetector, const std::vector<cv::KeyPoint>& kps, const cv::Mat desc, const cv::Mat& inFrame
 ) {
   std::vector<gen::Observation> obs;
-  const size_t desc_size = _featureDetector->descriptorSize() * sizeof(_featureDetector->descriptorType());
+  const size_t desc_size = _featureDetector->descriptorSize() * desc.elemSize();
   for (uint i = 0; i < kps.size(); i++) {
-//cout<<desc.rows<<":"<<desc.cols<<"::"<<desc.type()<<"::"<<sizeof(desc.ptr<float>(i))<<":"<<(desc.ptr<float>(i))<<endl;
+// cout<< i << ":" << desc.rows<<":"<<desc.cols<<"::"<<desc.type()<<"::"<<sizeof(desc.ptr<float>(i))<<":"<<(desc.ptr<float>(i))<<endl;
     const cv::KeyPoint& kp = kps[i];
     Observation o(convertCV(kp, inFrame.at<cv::Vec3b>(kp.pt).val));
     char descriptor[desc_size];

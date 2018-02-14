@@ -27,17 +27,18 @@ std::vector<gen::Observation> convertCV(
 ) {
   std::vector<gen::Observation> obs;
   const size_t desc_size = _featureDetector->descriptorSize() * desc.elemSize();
+  char *descriptor = new char[desc_size];
   for (uint i = 0; i < kps.size(); i++) {
 // cout<< i << ":" << desc.rows<<":"<<desc.cols<<"::"<<desc.type()<<"::"<<sizeof(desc.ptr<float>(i))<<":"<<(desc.ptr<float>(i))<<endl;
     const cv::KeyPoint& kp = kps[i];
     Observation o(convertCV(kp, inFrame.at<cv::Vec3b>(kp.pt).val));
-    char descriptor[desc_size];
     memcpy(descriptor, desc.ptr(i), desc_size);
     o.descriptor.assign(descriptor, descriptor+desc_size);
     o.__isset.descriptor = true;
 
     obs.push_back(o);
   }
+  delete[] descriptor;
 
   return obs;
 };

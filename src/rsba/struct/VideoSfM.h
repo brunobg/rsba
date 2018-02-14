@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <opencv2/core/core.hpp>
+#include <opencv2/features2d.hpp>
 
 #include "rsba/gen-cpp/VideoSfM.h"
 #include "rsba/SfmOptions.h"
@@ -128,7 +129,7 @@ public:
 // conversion functions:
 
 Observation convertCV(const cv::KeyPoint& kp, const unsigned char color[3]);
-std::vector<gen::Observation> convertCV(const std::vector<cv::KeyPoint>& kps, const cv::Mat desc, const cv::Mat& inFrame);
+std::vector<gen::Observation> convertCV(const cv::Ptr<cv::Feature2D> _featureDetector, const std::vector<cv::KeyPoint>& kps, const cv::Mat desc, const cv::Mat& inFrame);
 void convertCV(std::vector<gen::Observation>& obs, const std::vector<cv::DMatch>& mts, const size_t frameKey);
 
 inline std::vector<double> convertCV(const cv::Matx34d& P) {
@@ -143,7 +144,7 @@ inline std::vector<double> convertCV(const cv::Matx34d& P) {
   return pose;
 };
 
-void toCV(const std::vector<gen::Observation>& obs, std::vector<cv::KeyPoint>& pts, cv::Mat& desc);
+void toCV(const cv::Ptr<cv::Feature2D> _featureDetector, const std::vector<gen::Observation>& obs, std::vector<cv::KeyPoint>& pts, cv::Mat& desc);
 
 void getPose(const gen::Session& sess, const gen::Frame& f, const SfmOptions& opt, const double obs[2], double pose[NUM_POSE_PARAMS]);
 double* getPose(const gen::Session& sess, gen::Frame& f, const SfmOptions& opt, const double obs[2]);

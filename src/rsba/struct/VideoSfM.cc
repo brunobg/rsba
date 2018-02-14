@@ -8,10 +8,6 @@ using namespace ::std;
 using namespace ::apache::thrift;
 using namespace ::vision;
 
-#define FEATURE_TYPE CV_32F
-#define FEATURE_SIZE 128
-const static size_t desc_size = FEATURE_SIZE * sizeof(float); //HACK size of 32F used in SIFT
-
 
 namespace vision { namespace sfm {
 
@@ -26,13 +22,15 @@ Observation convertCV(const cv::KeyPoint& kp, const unsigned char color[3]) {
 };
 
 
-std::vector<gen::Observation> convertCV(const std::vector<cv::KeyPoint>& kps, const cv::Mat desc, const cv::Mat& inFrame) {
+std::vector<gen::Observation> convertCV(
+	const cv::Ptr<cv::Feature2D> _featureDetector, const std::vector<cv::KeyPoint>& kps, const cv::Mat desc, const cv::Mat& inFrame
+) {
   std::vector<gen::Observation> obs;
+  const size_t desc_size = _featureDetector->descriptorSize() * sizeof(_featureDetector->descriptorType());
   for (uint i = 0; i < kps.size(); i++) {
 //cout<<desc.rows<<":"<<desc.cols<<"::"<<desc.type()<<"::"<<sizeof(desc.ptr<float>(i))<<":"<<(desc.ptr<float>(i))<<endl;
     const cv::KeyPoint& kp = kps[i];
     Observation o(convertCV(kp, inFrame.at<cv::Vec3b>(kp.pt).val));
-
     char descriptor[desc_size];
     memcpy(descriptor, desc.ptr(i), desc_size);
     o.descriptor.assign(descriptor, descriptor+desc_size);
@@ -54,8 +52,9 @@ void convertCV(std::vector<gen::Observation>& obs, const std::vector<cv::DMatch>
 };
 
 
-void toCV(const std::vector<gen::Observation>& obs, std::vector<cv::KeyPoint>& pts, cv::Mat& desc) {
-  desc.create(obs.size(), FEATURE_SIZE, FEATURE_TYPE);
+void toCV(const cv::Ptr<cv::Feature2D> _featureDetector, const std::vector<gen::Observation>& obs, std::vector<cv::KeyPoint>& pts, cv::Mat& desc) {
+  const size_t desc_size = _featureDetector->descriptorSize() * sizeof(_featureDetector->descriptorType());
+  desc.create(obs.size(), _featureDetector->descriptorSize(), _featureDetector->descriptorType());
 
   for (uint i = 0; i < obs.size(); i++) {
     const gen::Observation& o = obs[i];

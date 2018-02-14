@@ -191,7 +191,7 @@ bool VideoSfMClient::parseFrame(const cv::Mat& inFrame, cv::Mat& outFrame, const
       _featureDetector->detect(_nextImg, _keypoints[frameKey]);
       _featureDetector->compute(_nextImg, _keypoints[frameKey], _descriptors[frameKey]);
       cout << _keypoints[frameKey].size() << " features found" << endl;
-      f.obs = convertCV(_keypoints[frameKey], _descriptors[frameKey], inFrame);
+      f.obs = convertCV(_featureDetector, _keypoints[frameKey], _descriptors[frameKey], inFrame);
       f.__isset.obs = true;
       //TODO load/cache descriptors
 
@@ -207,7 +207,7 @@ bool VideoSfMClient::parseFrame(const cv::Mat& inFrame, cv::Mat& outFrame, const
   } else {
     _keypoints.resize(frameKey+1);
     _descriptors.resize(frameKey+1);
-    toCV(f.obs, _keypoints[frameKey], _descriptors[frameKey]);
+    toCV(_featureDetector, f.obs, _keypoints[frameKey], _descriptors[frameKey]);
   }
 
   return true;

@@ -55,6 +55,7 @@ void convertCV(std::vector<gen::Observation>& obs, const std::vector<cv::DMatch>
 
 void toCV(const cv::Ptr<cv::Feature2D> _featureDetector, const std::vector<gen::Observation>& obs, std::vector<cv::KeyPoint>& pts, cv::Mat& desc) {
   const size_t desc_size = _featureDetector->descriptorSize() * sizeof(_featureDetector->descriptorType());
+  char *descriptor = new char[desc_size];
   desc.create(obs.size(), _featureDetector->descriptorSize(), _featureDetector->descriptorType());
 
   for (uint i = 0; i < obs.size(); i++) {
@@ -63,11 +64,11 @@ void toCV(const cv::Ptr<cv::Feature2D> _featureDetector, const std::vector<gen::
 
     if (o.__isset.descriptor) {
       memcpy(desc.ptr(i), o.descriptor.c_str(), o.descriptor.capacity());
-      char descriptor[desc_size];
       memcpy(descriptor, desc.ptr(i), desc_size);
 //cout << descriptor << endl;
     }
   }
+  delete[] descriptor;
 };
 
 

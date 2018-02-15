@@ -129,7 +129,7 @@ public:
 // conversion functions:
 
 Observation convertCV(const cv::KeyPoint& kp, const unsigned char color[3]);
-std::vector<gen::Observation> convertCV(const cv::Ptr<cv::Feature2D> _featureDetector, const std::vector<cv::KeyPoint>& kps, const cv::Mat desc, const cv::Mat& inFrame);
+std::vector<gen::Observation> convertCV(const cv::Ptr<cv::Feature2D> _featureDetector, const std::vector<cv::KeyPoint>& kps, const cv::Mat &desc, const cv::Mat& inFrame);
 void convertCV(std::vector<gen::Observation>& obs, const std::vector<cv::DMatch>& mts, const size_t frameKey);
 
 inline std::vector<double> convertCV(const cv::Matx34d& P) {

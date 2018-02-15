@@ -23,22 +23,19 @@ Observation convertCV(const cv::KeyPoint& kp, const unsigned char color[3]) {
 
 
 std::vector<gen::Observation> convertCV(
-	const cv::Ptr<cv::Feature2D> _featureDetector, const std::vector<cv::KeyPoint>& kps, const cv::Mat desc, const cv::Mat& inFrame
+	const cv::Ptr<cv::Feature2D> _featureDetector, const std::vector<cv::KeyPoint>& kps, const cv::Mat &desc, const cv::Mat& inFrame
 ) {
+  const size_t desc_size = _featureDetector->descriptorSize() * sizeof(_featureDetector->descriptorType());
   std::vector<gen::Observation> obs;
-  const size_t desc_size = _featureDetector->descriptorSize() * desc.elemSize();
-  char *descriptor = new char[desc_size];
   for (uint i = 0; i < kps.size(); i++) {
 // cout<< i << ":" << desc.rows<<":"<<desc.cols<<"::"<<desc.type()<<"::"<<sizeof(desc.ptr<float>(i))<<":"<<(desc.ptr<float>(i))<<endl;
     const cv::KeyPoint& kp = kps[i];
     Observation o(convertCV(kp, inFrame.at<cv::Vec3b>(kp.pt).val));
-    memcpy(descriptor, desc.ptr(i), desc_size);
-    o.descriptor.assign(descriptor, descriptor+desc_size);
+    o.descriptor.assign(desc.ptr(i), desc.ptr(i)+desc_size);
     o.__isset.descriptor = true;
 
     obs.push_back(o);
   }
-  delete[] descriptor;
 
   return obs;
 };
@@ -54,8 +51,6 @@ void convertCV(std::vector<gen::Observation>& obs, const std::vector<cv::DMatch>
 
 
 void toCV(const cv::Ptr<cv::Feature2D> _featureDetector, const std::vector<gen::Observation>& obs, std::vector<cv::KeyPoint>& pts, cv::Mat& desc) {
-  const size_t desc_size = _featureDetector->descriptorSize() * sizeof(_featureDetector->descriptorType());
-  char *descriptor = new char[desc_size];
   desc.create(obs.size(), _featureDetector->descriptorSize(), _featureDetector->descriptorType());
 
   for (uint i = 0; i < obs.size(); i++) {
@@ -64,11 +59,8 @@ void toCV(const cv::Ptr<cv::Feature2D> _featureDetector, const std::vector<gen::
 
     if (o.__isset.descriptor) {
       memcpy(desc.ptr(i), o.descriptor.c_str(), o.descriptor.capacity());
-      memcpy(descriptor, desc.ptr(i), desc_size);
-//cout << descriptor << endl;
     }
   }
-  delete[] descriptor;
 };
 
 
